@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        #search-input {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        #search-button:hover {
+            background-color: #0056b3;
+        }
+
+        #recommendations {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .movie-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .movie-card {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .movie-card h3 {
+            margin: 0 0 10px;
+        }
+
+        .movie-card button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .movie-card button:hover {
+            background-color: #218838;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .filters select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Movie Recommender</h1>
+            <p>Find your next favorite movie!</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search for a movie...">
+            <button id="search-button">Search</button>
+        </div>
+
+        <div class="filters">
+            <select id="genre-filter">
+                <option value="">Filter by Genre</option>
+                <option value="Action">Action</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Drama">Drama</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+            </select>
+            <select id="year-filter">
+                <option value="">Filter by Year</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+            </select>
+        </div>
+
+        <section id="recommendations">
+            <h2>Recommended Movies</h2>
+            <div id="movie-list" class="movie-list">
+                <!-- Movies will be dynamically inserted here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Movie Recommender</p>
+    </footer>
+
+    <script>
+        const searchButton = document.getElementById('search-button');
+        const searchInput = document.getElementById('search-input');
+        const genreFilter = document.getElementById('genre-filter');
+        const yearFilter = document.getElementById('year-filter');
+        const movieList = document.getElementById('movie-list');
+
+        const apiKey = '493fbbdb810cc106356260d6cafe4000'; // Replace with your OMDB API key
+
+        async function fetchMovies(query, genre, year) {
+            const url = new URL('https://api.themoviedb.org/3/movie/11');
+            url.searchParams.append('apikey', apiKey);
+            if (query) url.searchParams.append('s', query);
+            if (genre) url.searchParams.append('genre', genre);
+            if (year) url.searchParams.append('y', year);
+
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.Search || [];
+        }
+
+        function displayMovies(movies) {
+            movieList.innerHTML = '';
+            movies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.classList.add('movie-card');
+                movieCard.innerHTML = `
+                    <h3>${movie.Title}</h3>
+                    <p>Year: ${movie.Year}</p>
+                    <img src="${movie.Poster}" alt="${movie.Title} Poster" style="width:100%; border-radius: 4px; margin-top: 10px;">
+                    <button>Add to Favorites</button>
+                `;
+
+                const favoriteButton = movieCard.querySelector('button');
+                favoriteButton.addEventListener('click', () => {
+                    alert(`${movie.Title} added to favorites!`);
+                });
+
+                movieList.appendChild(movieCard);
+            });
+        }
+
+        async function filterMovies() {
+            const query = searchInput.value.trim();
+            const genre = genreFilter.value;
+            const year = yearFilter.value;
+
+            const movies = await fetchMovies(query, genre, year);
+            displayMovies(movies);
+        }
+
+        searchButton.addEventListener('click', filterMovies);
+        genreFilter.addEventListener('change', filterMovies);
+        yearFilter.addEventListener('change', filterMovies);
+    </script>
+</body>
+</html>

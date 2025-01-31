@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <h1>LOLCAT CLOCK</h1>
+      </header>
+      <h4>
+        I CAN HAZ TIME?? <br>
+        <span id="clock">Clock goes here</span>
+      </h4>
+
+      <script>
+        var wakeuptime = 7;
+        var noon = 12;
+        var lunchtime = 12;
+        var naptime= lunchtime +2;
+
+        var partytime;
+        var evening = 18;
+
+
+        var showCurrentTime = function(){
+            var clock = document.getElementById("clock");
+            var currentTime = new Date();
+            console.log(currentTime);
+            var hours = currentTime.getHours();
+            console.log(hours);
+            var minutes = currentTime.getMinutes();
+            var seconds = currentTime.getSeconds();
+            var meridian ="AM";
+
+            if(hours>=12){
+            meridian="PM";
+            }
+
+                if (hours > noon)
+            {
+                hours = hours - 12;
+                console.log(hours);
+            }
+
+
+             if (minutes < 10)
+            {
+                minutes = "0" + minutes;
+            }
+        
+            // Set Seconds
+            if (seconds < 10)
+            {
+                seconds = "0" + seconds;
+            }
+
+            var clockTime = hours +":"+ minutes+ ":"+seconds+" "+meridian+ "!";
+
+            clock.innerHTML = clockTime;
+
+        }
+       
+
+        showCurrentTime();
+      </script>
+</body>
+</html>
